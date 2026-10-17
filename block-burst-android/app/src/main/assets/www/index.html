@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en" data-q="mid">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#17102f">
+<title>Block Burst</title>
+<!-- fonts:start -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@700;800&display=swap">
+<!-- fonts:end -->
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- app:start -->
+<div class="photo" id="photo" aria-hidden="true"><div class="photo-bg" id="photoBg"></div><div class="photo-fg" id="photoFg"></div></div>
+<div class="sky" id="sky" aria-hidden="true"></div>
+<div class="shade" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<canvas class="ambient" id="ambient" aria-hidden="true"></canvas>
+<div class="pulse" id="pulse" aria-hidden="true"></div>
+
+<main class="app" data-mode="stack">
+  <header class="top">
+    <div class="best" title="Best score" aria-label="Best score">
+      <span class="crown" aria-hidden="true"></span>
+      <span class="rainbow" id="best">0</span>
+    </div>
+    <div class="score" id="score">0</div>
+  </header>
+
+  <section class="board-panel" id="boardWrap">
+    <canvas id="board" aria-label="Game board"></canvas>
+    <div class="over" id="over" hidden>
+      <div class="over-card">
+        <div class="over-score" id="finalScore">0</div>
+        <div class="over-best" id="newBest" hidden>
+          <span class="crown" aria-hidden="true"></span>
+          <span class="rainbow">New best</span>
+        </div>
+        <button type="button" class="cta" id="again">Play again</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="tray" id="tray" data-orient="row">
+    <div class="slot" data-i="0" tabindex="0" aria-label="Piece 1"><canvas></canvas></div>
+    <div class="slot" data-i="1" tabindex="0" aria-label="Piece 2"><canvas></canvas></div>
+    <div class="slot" data-i="2" tabindex="0" aria-label="Piece 3"><canvas></canvas></div>
+  </section>
+
+  <nav class="tools" id="tools" aria-label="Game options">
+    <button type="button" class="icon-btn" id="settingsBtn" aria-label="Settings" title="Settings">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h8M18 7h2M4 12h2M12 12h8M4 17h9M19 17h1"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="12" r="2.2"/><circle cx="16" cy="17" r="2.2"/></svg>
+    </button>
+    <button type="button" class="icon-btn" id="shuffleBtn" aria-label="Shuffle pieces" title="Shuffle pieces">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h3.2c2.8 0 4.2 1.9 5.6 4.6 1.4 2.7 2.8 4.4 5.6 4.4H20M3 17h3.2c1.4 0 2.5-.5 3.5-1.5M13.6 8.6C14.6 7.5 15.8 7 17.4 7H20"/><path d="M17.5 4.5 20 7l-2.5 2.5M17.5 14.5 20 17l-2.5 2.5"/></svg>
+      <span class="badge" id="shuffleCount" aria-hidden="true">3</span>
+    </button>
+    <button type="button" class="icon-btn" id="biomeBtn" aria-label="Next biome" title="Next biome">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.3 0 2.1-.9 2.1-1.9 0-.6-.2-1-.5-1.3-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><circle cx="7.6" cy="11" r="1"/><circle cx="10" cy="7.2" r="1"/><circle cx="15" cy="7.2" r="1"/></svg>
+    </button>
+  </nav>
+</main>
+
+<canvas class="burst" id="burst" aria-hidden="true"></canvas>
+<div class="banner" id="banner" aria-live="polite"></div>
+<div class="note" id="note" role="status" aria-live="polite"></div>
+
+<div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+<section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+  <header class="sheet-head">
+    <h2 id="sheetTitle">Settings</h2>
+    <button type="button" class="icon-btn" id="closeBtn" aria-label="Close without saving" title="Close without saving">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </header>
+
+  <div class="sheet-body">
+    <section class="set" aria-labelledby="hSound">
+      <h3 id="hSound">Sound effects</h3>
+      <div class="set-row">
+        <label class="switch">
+          <input type="checkbox" role="switch" id="sfxOn" checked aria-label="Sound effects on or off">
+          <span class="knob" aria-hidden="true"></span>
+        </label>
+        <label class="slider">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3.5L12 18V6L7.5 10z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></svg>
+          <input type="range" id="sfxVol" min="0" max="100" value="70" aria-label="Sound effects volume">
+        </label>
+      </div>
+    </section>
+
+    <section class="set" aria-labelledby="hMusic">
+      <h3 id="hMusic">Music</h3>
+      <div class="set-row">
+        <button type="button" class="pill" id="addMusic">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg>
+          Add music
+        </button>
+        <input type="file" id="musicFile" class="sr" accept="audio/*,.mp3,.m4a,.aac,.ogg,.wav,.flac" multiple tabindex="-1" aria-hidden="true">
+      </div>
+      <ul class="tracks" id="trackList"></ul>
+      <div class="set-row transport">
+        <button type="button" class="icon-btn" id="prevBtn" aria-label="Previous track" title="Previous track">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 6v12"/><path d="M18 6.5v11L9.5 12z" fill="currentColor"/></svg>
+        </button>
+        <button type="button" class="icon-btn" id="playBtn" aria-label="Play music" title="Play or pause">
+          <svg id="iconPlay" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
+          <svg id="iconPause" viewBox="0 0 24 24" aria-hidden="true" hidden><rect x="6.5" y="5.5" width="4" height="13" rx="1" fill="currentColor"/><rect x="13.5" y="5.5" width="4" height="13" rx="1" fill="currentColor"/></svg>
+        </button>
+        <button type="button" class="icon-btn" id="nextBtn" aria-label="Next track" title="Next track">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 6v12"/><path d="M6 6.5v11L14.5 12z" fill="currentColor"/></svg>
+        </button>
+        <label class="slider">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3.5L12 18V6L7.5 10z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6"/></svg>
+          <input type="range" id="musicVol" min="0" max="100" value="60" aria-label="Music volume">
+        </label>
+      </div>
+    </section>
+
+    <section class="set" aria-labelledby="hPhoto">
+      <h3 id="hPhoto">Background photo</h3>
+      <div class="set-row">
+        <button type="button" class="pill" id="changeBtn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3.5"/><circle cx="9" cy="10" r="1.8"/><path d="M4 17.5l5-5 4 4 3-3 4 4"/></svg>
+          <span id="changeLabel">Add photo</span>
+        </button>
+        <button type="button" class="pill" id="removeBtn" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>
+          Remove
+        </button>
+        <label class="slider" id="dimWrap" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg>
+          <input type="range" id="dim" min="0" max="90" value="25" aria-label="Dim photo">
+        </label>
+        <input type="file" id="file" class="sr" accept="image/*" tabindex="-1" aria-hidden="true">
+      </div>
+      <div class="set-row" id="fitWrap" hidden>
+        <div class="seg" role="radiogroup" aria-label="Photo fit" id="fitSeg">
+          <button type="button" role="radio" aria-checked="true" data-v="auto">Auto</button>
+          <button type="button" role="radio" aria-checked="false" data-v="fill">Fill</button>
+          <button type="button" role="radio" aria-checked="false" data-v="fit">Fit</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="set" aria-labelledby="hGame">
+      <h3 id="hGame">Game</h3>
+      <div class="set-row between">
+        <span class="set-text" id="rsLabel">Start with random blocks</span>
+        <label class="switch">
+          <input type="checkbox" role="switch" id="randomStart" aria-labelledby="rsLabel">
+          <span class="knob" aria-hidden="true"></span>
+        </label>
+      </div>
+    </section>
+
+    <section class="set" aria-labelledby="hPerf">
+      <h3 id="hPerf">Performance</h3>
+      <div class="set-row">
+        <div class="seg" role="radiogroup" aria-label="Performance" id="qSeg">
+          <button type="button" role="radio" aria-checked="true" data-v="auto">Auto</button>
+          <button type="button" role="radio" aria-checked="false" data-v="low">Saver</button>
+          <button type="button" role="radio" aria-checked="false" data-v="mid">Balanced</button>
+          <button type="button" role="radio" aria-checked="false" data-v="high">Full</button>
+        </div>
+      </div>
+      <p class="hint" id="qHint"></p>
+    </section>
+  </div>
+
+  <footer class="sheet-foot">
+    <button type="button" class="cta" id="saveBtn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+      Save
+    </button>
+  </footer>
+</section>
+<!-- app:end -->
+<script src="script.js"></script>
+</body>
+</html>

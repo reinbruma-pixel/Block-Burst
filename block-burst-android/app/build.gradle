@@ -1,0 +1,32 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.blockburst.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.blockburst.app'
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    // serves the game from app assets over https://appassets.androidplatform.net so storage and audio behave like a real site
+    implementation 'androidx.webkit:webkit:1.11.0'
+}

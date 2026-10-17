@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Block Burst</string>
+    <string name="widget_label">Block Burst progress</string>
+    <string name="widget_desc">Your best score and a graph of every game. Tap to play.</string>
+    <string name="widget_cd">Block Burst progress graph. Tap to play.</string>
+</resources>
